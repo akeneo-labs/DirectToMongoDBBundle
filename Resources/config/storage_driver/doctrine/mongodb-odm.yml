@@ -1,0 +1,16 @@
+parameters:
+    pim_direct_to_mongodb.saver.product.class: Pim\Bundle\DirectToMongoDBBundle\Saver\ProductSaver
+
+services:
+    pim_catalog.saver.product:
+        class: %pim_direct_to_mongodb.saver.product.class%
+        arguments:
+            - '@pim_catalog.object_manager.product'
+            - '@pim_catalog.manager.completeness'
+            - '@pim_catalog.saver.product_options_resolver'
+            - '@event_dispatcher'
+            - '@pim_versioning.doctrine.mongodb.pending_mass_persister'
+            - '@pim_serializer'
+            - '@pim_catalog.mongodb.mongo_objects_factory'
+            - %pim_catalog.entity.product.class%
+

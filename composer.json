@@ -1,0 +1,37 @@
+{
+    "name": "akeneo-labs/direct-to-mongodb",
+    "type": "symfony-bundle",
+    "description": "Akeneo PIM Bundle to use direct to DB method to save products",
+    "keywords": ["pim", "akeneo", "ecommerce", "e-commerce", "data", "performances"],
+    "homepage": "http://akeneo.com",
+    "license": "OSL-3.0",
+    "authors": [
+        {
+            "name": "Benoit Jacquemont",
+            "email": "benoit@akeneo.com",
+            "homepage": "http://www.akeneo.com/"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/akeneo/pim-community-dev.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/akeneo/platform.git"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.4",
+        "akeneo/pim-community-dev": "~1.4.0",
+        "doctrine/migrations": "1.0.*@dev",
+        "doctrine/mongodb-odm": "1.0.0-beta10@dev",
+        "doctrine/mongodb-odm-bundle": "v3.0.0-BETA6@dev"
+    },
+    "autoload": {
+        "psr-0": {"Pim\\Bundle\\DirectToMongoDBBundle\\": ""}
+    },
+    "minimum-stability": "stable",
+    "target-dir": "Pim/Bundle/DirectToMongoDBBundle"
+}
