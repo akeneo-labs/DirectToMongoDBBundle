@@ -26,7 +26,7 @@
         "php": ">=5.4.4",
         "akeneo/pim-community-dev": "~1.4.0",
         "doctrine/migrations": "1.0.*@dev",
-        "doctrine/mongodb-odm": "1.0.0-beta10@dev",
+        "doctrine/mongodb-odm": "1.0.0-beta12@dev",
         "doctrine/mongodb-odm-bundle": "v3.0.0-BETA6@dev"
     },
     "autoload": {
