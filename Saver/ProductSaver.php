@@ -2,6 +2,7 @@
 
 namespace Pim\Bundle\DirectToMongoDBBundle\Saver;
 
+use Akeneo\Bundle\StorageUtilsBundle\MongoDB\MongoObjectsFactory;
 use Akeneo\Component\StorageUtils\Saver\SavingOptionsResolverInterface;
 use Akeneo\Component\StorageUtils\StorageEvents;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -9,12 +10,11 @@ use Doctrine\Common\Util\ClassUtils;
 use Pim\Bundle\CatalogBundle\Doctrine\Common\Saver\ProductSaver as BaseProductSaver;
 use Pim\Bundle\CatalogBundle\Manager\CompletenessManager;
 use Pim\Bundle\CatalogBundle\Model\ProductInterface;
+use Pim\Bundle\DirectToMongoDBBundle\Versioning\BulkVersionPersister;
 use Pim\Bundle\TransformBundle\Normalizer\MongoDB\ProductNormalizer;
-use Pim\Bundle\VersioningBundle\Doctrine\MongoDBODM\PendingMassPersister;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Akeneo\Bundle\StorageUtilsBundle\MongoDB\MongoObjectsFactory;
 
 /**
  * Direct To Db Mongo bulk product saver
@@ -25,8 +25,8 @@ use Akeneo\Bundle\StorageUtilsBundle\MongoDB\MongoObjectsFactory;
  */
 class ProductSaver extends BaseProductSaver
 {
-    /**@var PendingMassPersister */
-    protected $pendingPersister;
+    /**@var BulkVersionPersister */
+    protected $versionPersister;
 
     /** @var NormalizerInterface */
     protected $normalizer;
@@ -54,14 +54,14 @@ class ProductSaver extends BaseProductSaver
         CompletenessManager $completenessManager,
         SavingOptionsResolverInterface $optionsResolver,
         EventDispatcherInterface $eventDispatcher,
-        PendingMassPersister $pendingPersister,
+        BulkVersionPersister $versionPersister,
         NormalizerInterface $normalizer,
         MongoObjectsFactory $mongoFactory,
         $productClass
     ) {
         parent::__construct($om, $completenessManager, $optionsResolver, $eventDispatcher);
 
-        $this->pendingPersister = $pendingPersister;
+        $this->versionPersister = $versionPersister;
         $this->normalizer       = $normalizer;
         $this->mongoFactory     = $mongoFactory;
         $this->productClass     = $productClass;
@@ -109,7 +109,7 @@ class ProductSaver extends BaseProductSaver
             $this->updateDocuments($updateDocs);
         }
 
-        $this->pendingPersister->persistPendingVersions($products);
+        $this->versionPersister->bulkPersist($products);
 
         $this->eventDispatcher->dispatch(StorageEvents::POST_SAVE_ALL, new GenericEvent($products));
     }
