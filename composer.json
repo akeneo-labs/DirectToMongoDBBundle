@@ -29,6 +29,12 @@
         "doctrine/mongodb-odm": "1.0.0-beta12@dev",
         "doctrine/mongodb-odm-bundle": "v3.0.0-BETA6@dev"
     },
+    "require-dev": {
+        "fabpot/php-cs-fixer" : "~1"
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
     "autoload": {
         "psr-0": {"Pim\\Bundle\\DirectToMongoDBBundle\\": ""}
     },

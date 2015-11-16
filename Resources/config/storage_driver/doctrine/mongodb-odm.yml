@@ -1,7 +1,18 @@
 parameters:
     pim_direct_to_mongodb.saver.product.class: Pim\Bundle\DirectToMongoDBBundle\Saver\ProductSaver
+    pim_direct_to_mongodb.versioning.bulk_version_persister.class: Pim\Bundle\DirectToMongoDBBundle\Versioning\BulkVersionPersister
 
 services:
+    pim_direct_to_mongodb.versioning.bulk_version_persister:
+        class: %pim_direct_to_mongodb.versioning.bulk_version_persister.class%
+        arguments:
+            - '@pim_versioning.builder.version'
+            - '@pim_versioning.manager.version'
+            - '@pim_versioning.context.version'
+            - '@pim_serializer'
+            - '@pim_versioning.object_manager.version'
+            - %pim_versioning.entity.version.class%
+
     pim_catalog.saver.product:
         class: %pim_direct_to_mongodb.saver.product.class%
         arguments:
@@ -9,7 +20,7 @@ services:
             - '@pim_catalog.manager.completeness'
             - '@pim_catalog.saver.product_options_resolver'
             - '@event_dispatcher'
-            - '@pim_versioning.doctrine.mongodb.pending_mass_persister'
+            - '@pim_direct_to_mongodb.versioning.bulk_version_persister'
             - '@pim_serializer'
             - '@pim_catalog.mongodb.mongo_objects_factory'
             - %pim_catalog.entity.product.class%
