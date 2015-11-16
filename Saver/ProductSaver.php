@@ -48,6 +48,10 @@ class ProductSaver extends BaseProductSaver
      * @param CompletenessManager            $completenessManager
      * @param SavingOptionsResolverInterface $optionsResolver
      * @param EventDispatcherInterface       $eventDispatcher
+     * @param BulkVersionPersister           $versionPersister
+     * @param NormalizerInterface            $normalizer
+     * @param MongoObjectsFactory            $mongoFactory
+     * @param string                         $productClass
      */
     public function __construct(
         ObjectManager $om,
@@ -65,8 +69,6 @@ class ProductSaver extends BaseProductSaver
         $this->normalizer       = $normalizer;
         $this->mongoFactory     = $mongoFactory;
         $this->productClass     = $productClass;
-
-        $this->collection = $this->objectManager->getDocumentCollection($this->productClass);
     }
 
     /**
@@ -79,6 +81,7 @@ class ProductSaver extends BaseProductSaver
         if (empty($products)) {
             return;
         }
+        $this->collection = $this->objectManager->getDocumentCollection($this->productClass);
 
         $this->eventDispatcher->dispatch(StorageEvents::PRE_SAVE_ALL, new GenericEvent($products));
 
@@ -159,4 +162,3 @@ class ProductSaver extends BaseProductSaver
         }
     }
 }
-

@@ -9,7 +9,6 @@ use Pim\Bundle\VersioningBundle\Doctrine\AbstractPendingMassPersister;
 use Pim\Bundle\VersioningBundle\Manager\VersionContext;
 use Pim\Bundle\VersioningBundle\Manager\VersionManager;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Pim\Bundle\VersioningBundle\Model\VersionableInterface;
 
 /**
  * Service to massively insert versions.

@@ -14,4 +14,3 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class PimDirectToMongoDBBundle extends Bundle
 {
 }
-
