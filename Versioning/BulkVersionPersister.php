@@ -6,9 +6,12 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Pim\Bundle\TransformBundle\Normalizer\MongoDB\VersionNormalizer;
 use Pim\Bundle\VersioningBundle\Builder\VersionBuilder;
 use Pim\Bundle\VersioningBundle\Doctrine\AbstractPendingMassPersister;
+use Pim\Bundle\VersioningBundle\Event\BuildVersionEvent;
+use Pim\Bundle\VersioningBundle\Event\BuildVersionEvents;
 use Pim\Bundle\VersioningBundle\Manager\VersionContext;
 use Pim\Bundle\VersioningBundle\Manager\VersionManager;
 use Pim\Bundle\VersioningBundle\Model\VersionableInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -39,13 +42,17 @@ class BulkVersionPersister
     /** @var NormalizerInterface */
     protected $normalizerInterface;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
-     * @param VersionBuilder      $versionBuilder
-     * @param VersionManager      $versionManager
-     * @param VersionContext      $versionContext
-     * @param NormalizerInterface $normalizer
-     * @param DocumentManager     $documentManager
-     * @param string              $versionClass
+     * @param VersionBuilder           $versionBuilder
+     * @param VersionManager           $versionManager
+     * @param VersionContext           $versionContext
+     * @param NormalizerInterface      $normalizer
+     * @param DocumentManager          $documentManager
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param string                   $versionClass
      */
     public function __construct(
         VersionBuilder $versionBuilder,
@@ -53,6 +60,7 @@ class BulkVersionPersister
         VersionContext $versionContext,
         NormalizerInterface $normalizer,
         DocumentManager $documentManager,
+        EventDispatcherInterface $eventDispatcher,
         $versionClass
     ) {
         $this->versionBuilder  = $versionBuilder;
@@ -60,6 +68,7 @@ class BulkVersionPersister
         $this->versionContext  = $versionContext;
         $this->normalizer      = $normalizer;
         $this->documentManager = $documentManager;
+        $this->eventDispatcher = $eventDispatcher;
         $this->versionClass    = $versionClass;
     }
 
@@ -74,15 +83,18 @@ class BulkVersionPersister
      */
     public function bulkPersist(array $versionables)
     {
-        $author = $this->versionManager->getUsername();
-        $context = $this->versionContext->getContextInfo();
-
         $versions = [];
         $changedDocIds = [];
+
+        $event = $this->eventDispatcher->dispatch(BuildVersionEvents::PRE_BUILD, new BuildVersionEvent());
+        if (null !== $event && null !== $event->getUsername()) {
+            $author = $event->getUsername();
+        }
 
         foreach ($versionables as $versionable) {
             $previousVersion = $this->getPreviousVersion($versionable);
 
+            $context = $this->versionContext->getContextInfo(get_class($versionable));
             $newVersion = $this->versionBuilder->buildVersion($versionable, $author, $previousVersion, $context);
 
             if (count($newVersion->getChangeSet()) > 0) {

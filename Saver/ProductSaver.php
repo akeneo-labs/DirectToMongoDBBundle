@@ -87,11 +87,12 @@ class ProductSaver extends BaseProductSaver
 
         $allOptions = $this->optionsResolver->resolveSaveAllOptions($options);
 
-        $itemOptions = $allOptions;
-        $itemOptions['flush'] = false;
+        // TODO check the "schedule" options to remove the completeness or not
+        // TODO manage the "recalculate" options
 
         $productsToInsert = [];
         $productsToUpdate = [];
+
         foreach ($products as $product) {
             if (null === $product->getId()) {
                 $productsToInsert[] = $product;
@@ -112,7 +113,9 @@ class ProductSaver extends BaseProductSaver
             $this->updateDocuments($updateDocs);
         }
 
-        $this->versionPersister->bulkPersist($products);
+        if (!$allOptions['differ_versioning']) {
+            $this->versionPersister->bulkPersist($products);
+        }
 
         $this->eventDispatcher->dispatch(StorageEvents::POST_SAVE_ALL, new GenericEvent($products));
     }

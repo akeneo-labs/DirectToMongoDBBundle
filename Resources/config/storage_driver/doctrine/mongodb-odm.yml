@@ -1,5 +1,6 @@
 parameters:
     pim_direct_to_mongodb.saver.product.class:                     Pim\Bundle\DirectToMongoDBBundle\Saver\ProductSaver
+    pim_direct_to_mongodb.saver.group.class:                       Pim\Bundle\DirectToMongoDBBundle\Saver\GroupSaver
     pim_direct_to_mongodb.versioning.bulk_version_persister.class: Pim\Bundle\DirectToMongoDBBundle\Versioning\BulkVersionPersister
     pim_direct_to_mongodb.normalizer.product_value.class:          Pim\Bundle\DirectToMongoDBBundle\Normalizer\ProductValueNormalizer
     pim_direct_to_mongodb.normalizer.metric.class:                 Pim\Bundle\DirectToMongoDBBundle\Normalizer\MetricNormalizer
@@ -13,6 +14,7 @@ services:
             - '@pim_versioning.context.version'
             - '@pim_serializer'
             - '@pim_versioning.object_manager.version'
+            - '@event_dispatcher'
             - %pim_versioning.entity.version.class%
 
     pim_catalog.saver.product:
@@ -25,6 +27,18 @@ services:
             - '@pim_direct_to_mongodb.versioning.bulk_version_persister'
             - '@pim_serializer'
             - '@pim_catalog.mongodb.mongo_objects_factory'
+            - %pim_catalog.entity.product.class%
+
+    pim_catalog.saver.group:
+        class: %pim_direct_to_mongodb.saver.group.class%
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@pim_catalog.saver.product'
+            - '@pim_catalog.manager.product_template_media'
+            - '@pim_catalog.applier.product_template'
+            - '@pim_versioning.context.version'
+            - '@pim_catalog.saver.group_options_resolver'
+            - '@event_dispatcher'
             - %pim_catalog.entity.product.class%
 
     pim_serializer.normalizer.mongodb.product_value:
