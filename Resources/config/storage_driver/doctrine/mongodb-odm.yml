@@ -1,6 +1,8 @@
 parameters:
-    pim_direct_to_mongodb.saver.product.class: Pim\Bundle\DirectToMongoDBBundle\Saver\ProductSaver
+    pim_direct_to_mongodb.saver.product.class:                     Pim\Bundle\DirectToMongoDBBundle\Saver\ProductSaver
     pim_direct_to_mongodb.versioning.bulk_version_persister.class: Pim\Bundle\DirectToMongoDBBundle\Versioning\BulkVersionPersister
+    pim_direct_to_mongodb.normalizer.product_value.class:          Pim\Bundle\DirectToMongoDBBundle\Normalizer\ProductValueNormalizer
+    pim_direct_to_mongodb.normalizer.metric.class:                 Pim\Bundle\DirectToMongoDBBundle\Normalizer\MetricNormalizer
 
 services:
     pim_direct_to_mongodb.versioning.bulk_version_persister:
@@ -25,3 +27,18 @@ services:
             - '@pim_catalog.mongodb.mongo_objects_factory'
             - %pim_catalog.entity.product.class%
 
+    pim_serializer.normalizer.mongodb.product_value:
+        class: %pim_direct_to_mongodb.normalizer.product_value.class%
+        arguments:
+            - '@pim_catalog.mongodb.mongo_objects_factory'
+        tags:
+            - { name: pim_serializer.normalizer, priority: 100 }
+
+    pim_serializer.normalizer.mongodb.metric:
+        class: %pim_direct_to_mongodb.normalizer.metric.class%
+        arguments:
+            - '@pim_catalog.mongodb.mongo_objects_factory'
+            - '@akeneo_measure.measure_converter'
+            - '@akeneo_measure.manager'
+        tags:
+            - { name: pim_serializer.normalizer, priority: 100 }
