@@ -85,7 +85,8 @@ class BulkVersionPersister
         $versions = [];
         $changedDocIds = [];
 
-        $event = $this->eventDispatcher->dispatch(BuildVersionEvents::PRE_BUILD, new BuildVersionEvent());
+        $author = VersionManager::DEFAULT_SYSTEM_USER;
+        $event  = $this->eventDispatcher->dispatch(BuildVersionEvents::PRE_BUILD, new BuildVersionEvent());
         if (null !== $event && null !== $event->getUsername()) {
             $author = $event->getUsername();
         }
