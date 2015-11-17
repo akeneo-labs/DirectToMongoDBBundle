@@ -27,5 +27,7 @@ class PimDirectToMongoDBExtension extends Extension
         if (file_exists(__DIR__ . '/../Resources/config/' . $storageConfig)) {
             $loader->load($storageConfig);
         }
+
+        $loader->load('normalizers.yml');
     }
 }

@@ -4,6 +4,9 @@ namespace Pim\Bundle\DirectToMongoDBBundle\Normalizer;
 
 use Akeneo\Bundle\StorageUtilsBundle\MongoDB\MongoObjectsFactory;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
+use Pim\Bundle\CatalogBundle\Model\AttributeInterface;
 use Pim\Bundle\CatalogBundle\Model\ProductValueInterface;
 use Pim\Bundle\TransformBundle\Normalizer\MongoDB\ProductNormalizer;
 use Pim\Bundle\TransformBundle\Normalizer\MongoDB\ProductValueNormalizer as BaseProductValueNormalizer;
@@ -21,6 +24,20 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ProductValueNormalizer extends BaseProductValueNormalizer
 {
+    /** @var ManagerRegistry */
+    protected $managerRegistry;
+
+    /**
+     * @param MongoObjectsFactory $mongoFactory
+     * @param ManagerRegistry     $managerRegistry
+     */
+    public function __construct(MongoObjectsFactory $mongoFactory, ManagerRegistry $managerRegistry)
+    {
+        parent::__construct($mongoFactory);
+
+        $this->managerRegistry = $managerRegistry;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -45,14 +62,62 @@ class ProductValueNormalizer extends BaseProductValueNormalizer
             $data['scope'] = $value->getScope();
         }
 
-        $backendType = $value->getAttribute()->getBackendType();
-
-        if ('options' !== $backendType) {
-            $data[$backendType] = $this->normalizeValueData($value->getData(), $backendType, $context);
-        } else {
-            $data['optionIds'] = $this->normalizeValueData($value->getData(), $backendType, $context);
-        }
+        $attribute   = $value->getAttribute();
+        $backendType = $attribute->getBackendType();
+        $key         = $this->getKeyForValue($value, $attribute, $backendType);
+        $data[$key]  = $this->normalizeValueData($value->getData(), $backendType, $context);
 
         return $data;
+    }
+
+    /**
+     * Decide what is the key used for data inside the normalized product value
+     *
+     * @param ProductValueInterface $value
+     * @param AttributeInterface    $attribute
+     * @param string                $backendType
+     *
+     * @return string
+     */
+    protected function getKeyForValue(ProductValueInterface $value, AttributeInterface $attribute, $backendType)
+    {
+        if ('options' === $backendType) {
+            return 'optionIds';
+        }
+
+        $refDataName = $attribute->getReferenceDataName();
+        if (null !== $refDataName) {
+            if ('reference_data_options' === $backendType) {
+                return $this->getReferenceDataFieldName($value, $refDataName);
+            }
+
+            return $refDataName;
+        }
+
+        return $backendType;
+    }
+
+    /**
+     * Search in Doctrine mapping what is the field name defined for the specified reference data
+     *
+     * @param ProductValueInterface $value
+     * @param string                $refDataName
+     *
+     * @throws \LogicException
+     *
+     * @return string
+     */
+    protected function getReferenceDataFieldName(ProductValueInterface $value, $refDataName)
+    {
+        $valueClass = ClassUtils::getClass($value);
+        $manager    = $this->managerRegistry->getManagerForClass($valueClass);
+        $metadata   = $manager->getClassMetadata($valueClass);
+        $fieldName  = $metadata->getFieldMapping($refDataName);
+
+        if (!isset($fieldName['idsField'])) {
+            throw new \LogicException(sprintf('No field name defined for reference data "%s"', $refDataName));
+        }
+
+        return $fieldName['idsField'];
     }
 }
