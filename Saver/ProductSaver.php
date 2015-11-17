@@ -113,9 +113,7 @@ class ProductSaver extends BaseProductSaver
             $this->updateDocuments($updateDocs);
         }
 
-        if (!$allOptions['differ_versioning']) {
-            $this->versionPersister->bulkPersist($products);
-        }
+        $this->versionPersister->bulkPersist($products);
 
         $this->eventDispatcher->dispatch(StorageEvents::POST_SAVE_ALL, new GenericEvent($products));
     }

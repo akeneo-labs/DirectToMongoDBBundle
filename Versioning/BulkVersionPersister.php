@@ -5,7 +5,6 @@ namespace Pim\Bundle\DirectToMongoDBBundle\Versioning;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Pim\Bundle\TransformBundle\Normalizer\MongoDB\VersionNormalizer;
 use Pim\Bundle\VersioningBundle\Builder\VersionBuilder;
-use Pim\Bundle\VersioningBundle\Doctrine\AbstractPendingMassPersister;
 use Pim\Bundle\VersioningBundle\Event\BuildVersionEvent;
 use Pim\Bundle\VersioningBundle\Event\BuildVersionEvents;
 use Pim\Bundle\VersioningBundle\Manager\VersionContext;
