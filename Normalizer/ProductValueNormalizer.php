@@ -47,13 +47,14 @@ class ProductValueNormalizer extends BaseProductValueNormalizer
             throw new \LogicException('Serializer must be a normalizer');
         }
 
-        $productId = $context[ProductNormalizer::MONGO_ID];
         $productCollection = $context[ProductNormalizer::MONGO_COLLECTION_NAME];
+        $productId = $context[ProductNormalizer::MONGO_ID];
+        $databaseName = $context[ProductNormalizer::MONGO_DATABASE_NAME];
 
         $data = [];
         $data['_id'] = $this->mongoFactory->createMongoId();
         $data['attribute'] = $value->getAttribute()->getId();
-        $data['entity'] = $this->mongoFactory->createMongoDBRef($productCollection, $productId);
+        $data['entity'] = $this->mongoFactory->createMongoDBRef($productCollection, $productId, $databaseName);
 
         if (null !== $value->getLocale()) {
             $data['locale'] = $value->getLocale();
