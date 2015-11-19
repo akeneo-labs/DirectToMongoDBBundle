@@ -45,6 +45,7 @@ services:
         class: %pim_direct_to_mongodb.normalizer.product_value.class%
         arguments:
             - '@pim_catalog.mongodb.mongo_objects_factory'
+            - '@akeneo_storage_utils.doctrine.smart_manager_registry'
         tags:
             - { name: pim_serializer.normalizer, priority: 100 }
 
