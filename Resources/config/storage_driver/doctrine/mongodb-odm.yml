@@ -28,6 +28,7 @@ services:
             - '@pim_serializer'
             - '@pim_catalog.mongodb.mongo_objects_factory'
             - %pim_catalog.entity.product.class%
+            - %mongodb_database%
 
     pim_catalog.saver.group:
         class: %pim_direct_to_mongodb.saver.group.class%

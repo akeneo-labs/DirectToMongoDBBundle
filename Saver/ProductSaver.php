@@ -7,6 +7,7 @@ use Akeneo\Component\StorageUtils\Saver\SavingOptionsResolverInterface;
 use Akeneo\Component\StorageUtils\StorageEvents;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\MongoDB\Collection;
 use Pim\Bundle\CatalogBundle\Doctrine\Common\Saver\ProductSaver as BaseProductSaver;
 use Pim\Bundle\CatalogBundle\Manager\CompletenessManager;
 use Pim\Bundle\CatalogBundle\Model\ProductInterface;
@@ -40,6 +41,9 @@ class ProductSaver extends BaseProductSaver
     /** @var string */
     protected $productClass;
 
+    /** @var string */
+    protected $databaseName;
+
     /** @var Collection */
     protected $collection;
 
@@ -52,6 +56,7 @@ class ProductSaver extends BaseProductSaver
      * @param NormalizerInterface            $normalizer
      * @param MongoObjectsFactory            $mongoFactory
      * @param string                         $productClass
+     * @param string                         $databaseName
      */
     public function __construct(
         ObjectManager $om,
@@ -61,7 +66,8 @@ class ProductSaver extends BaseProductSaver
         BulkVersionPersister $versionPersister,
         NormalizerInterface $normalizer,
         MongoObjectsFactory $mongoFactory,
-        $productClass
+        $productClass,
+        $databaseName
     ) {
         parent::__construct($om, $completenessManager, $optionsResolver, $eventDispatcher);
 
@@ -69,6 +75,7 @@ class ProductSaver extends BaseProductSaver
         $this->normalizer       = $normalizer;
         $this->mongoFactory     = $mongoFactory;
         $this->productClass     = $productClass;
+        $this->databaseName     = $databaseName;
     }
 
     /**
@@ -127,7 +134,10 @@ class ProductSaver extends BaseProductSaver
      */
     protected function getDocsFromProducts(array $products)
     {
-        $context = [ProductNormalizer::MONGO_COLLECTION_NAME => $this->collection->getName()];
+        $context = [
+            ProductNormalizer::MONGO_COLLECTION_NAME => $this->collection->getName(),
+            ProductNormalizer::MONGO_DATABASE_NAME   => $this->databaseName
+        ];
 
         $docs = [];
         foreach ($products as $product) {
