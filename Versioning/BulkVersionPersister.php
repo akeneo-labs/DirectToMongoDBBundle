@@ -99,7 +99,7 @@ class BulkVersionPersister
 
             if (count($newVersion->getChangeSet()) > 0) {
                 $versions[] = $newVersion;
-                $changedDocIds = $versionable->getId();
+                $changedDocIds[] = $versionable->getId();
             }
 
             if (null !== $previousVersion) {
