@@ -2,8 +2,8 @@
 
 Mass product saver using a direct to database approach to speed product saving.
 
-Must be used as dependency in 1.4 projects when using MongoDB storage.
+Must be used as dependency in 1.4.0 to 1.4.12 projects when using MongoDB storage.
 
-We'll integrate this behavior by default in the 1.5 and we'll depreciate this bundle.
+This behavior became default in 1.4.13. This bundle will be deprecated.
 
-When using this bundle, the http://docs.akeneo.com/latest/cookbook/import_export/mongodb-fast-writer.html is not required anymore, it will be deprecated in 1.5.
+When using this bundle, the http://docs.akeneo.com/1.4/cookbook/import_export/mongodb-fast-writer.html is not required anymore, it is deprecated since 1.4.13 and will be removed in 1.6.
